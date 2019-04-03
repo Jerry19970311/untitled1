@@ -24,17 +24,11 @@ public class TencentDispatch extends AbstractCatch{
         super();
         downloader=new FileDownload(basePath+"tencent");
         source="腾讯";
-        categories=new Gson().fromJson(new FileReader("tencent_categories"),TencentCategories.class);
+        categories=new Gson().fromJson(new FileReader("tencent_categories.json"),TencentCategories.class);
         dataBeans=categories.getData();
     }
     @Override
     protected void initSeeds() {
-    }
-
-    public NewsList getNewsList(String api) throws IOException {
-        String resultStr=getHtmlTextFromURL(api,"BGK");
-        Gson gson=new Gson();
-        return gson.fromJson(resultStr,NewsList.class);
     }
 
     @Override
@@ -49,6 +43,8 @@ public class TencentDispatch extends AbstractCatch{
         Gson gson=new Gson();
         Document document= Jsoup.parse(text);
         String base=document.selectFirst("head").children().last().data();
+        System.out.println(base);
+        base=base.substring(base.indexOf('{'));
         WindowDATA windowDATA= gson.fromJson(base,WindowDATA.class);
         result.setTopic(windowDATA.getTitle());
         result.setSource(source);
@@ -67,21 +63,49 @@ public class TencentDispatch extends AbstractCatch{
         return result;
     }
 
+    //腾讯的滚动新闻API在此处理。
     @Override
     protected String buildURLString() {
         int num=15;
         int page=0;
-        String listUrl=TENCENT_API+dataBeans.get(0).getChn()+":"+buildNowTime("yyyyMMdd")+"&num="+num+"&page=";
-        try {
-            NewsList newsList=getNewsList(listUrl);
-            if("ok"==newsList.getMsg()){
-
+        while (true) {
+            String listUrl = TENCENT_API + dataBeans.get(0).getName() + ":" + buildTime(2019,4,3,"yyyyMMdd") + "&num=" + num + "&page="+page;
+            try {
+                NewsList newsList = getNewsList(listUrl);
+                if ("ok".equals(newsList.getMsg())) {
+                    List<NewsList.DataBean> list = newsList.getData();
+                    Iterator<NewsList.DataBean> iterator = list.iterator();
+                    while (iterator.hasNext()) {
+                        String temp = iterator.next().getUrl();
+                        if(temp.startsWith("https")) {
+                            continue;
+                        }
+                        temp=temp.replace("http","https");
+                        System.out.println(temp);
+                        textHtmlQueue.add(temp);
+                    }
+                    page++;
+                    Thread.sleep((long) (2000+2000*Math.random()));
+                    System.out.println("??????????????????????????????????????");
+                }else {
+                    System.out.println("--------------------------------------"+page);
+                    break;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        seedQueue.add();
         return null;
+    }
+
+    public NewsList getNewsList(String api) throws IOException {
+        String resultStr=getHtmlTextFromURL(api,"UTF-8");
+        System.out.println(api);
+        System.out.println(resultStr);
+        Gson gson=new Gson();
+        return gson.fromJson(resultStr,NewsList.class);
     }
 
     @Override
@@ -98,7 +122,7 @@ public class TencentDispatch extends AbstractCatch{
         Elements elements=document.select("p[class=\""+ARTICLE_CLASS+"\"]");
         Iterator<Element> iterator=elements.iterator();
         while (iterator.hasNext()){
-            result=result+iterator.next();
+            result=result+iterator.next().text();
         }
         return result;
     }

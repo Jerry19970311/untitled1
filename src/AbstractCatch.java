@@ -70,9 +70,11 @@ public abstract class AbstractCatch {
     protected abstract void getNews();
     //将分析后的News统一加入给定队列。（该参数队列必须线程安全）
     protected void getNews(String charset) throws Exception {
+        buildURLString();
         while (!textHtmlQueue.isEmpty()){
             url=textHtmlQueue.poll();
             String html=getHtmlTextFromURL(url,charset);
+            System.out.println(html);
             analyse(html);
         }
     }

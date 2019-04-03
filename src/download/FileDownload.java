@@ -15,6 +15,7 @@ public class FileDownload implements Downloadable{
     @Override
     public void download(NewsItem newsItem){
         String dir=this.based+"/"+getDateIn8bits(newsItem.getPublish_time())+"/"+newsItem.getType()+"/";
+        System.out.println("dir:"+dir);
         forDir(dir);
         String path=dir+newsItem.getSource()+"-"+newsItem.getId();
         String text=getStringFromNewsItem(newsItem);
@@ -46,13 +47,14 @@ public class FileDownload implements Downloadable{
     public void forDir(String dir){
         File file=new File(dir);
         if(!file.exists()){
-            file.mkdir();
+            System.out.println("Creating dir");
+            file.mkdirs();
         }
     }
     public BufferedWriter forFile(String path) throws IOException {
         File file=new File(path);
         file.createNewFile();
-        FileOutputStream fileOutputStream=new FileOutputStream(file);
+        FileOutputStream fileOutputStream=new FileOutputStream(file,true);
         OutputStreamWriter outputStreamWriter=new OutputStreamWriter(fileOutputStream);
         BufferedWriter bufferedWriter=new BufferedWriter(outputStreamWriter);
         return bufferedWriter;
