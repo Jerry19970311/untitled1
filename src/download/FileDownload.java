@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class FileDownload implements Downloadable{
-    private String based;//基本路径（精确到source，也就是面向同一新闻网站）
+    protected String based;//基本路径（精确到source，也就是面向同一新闻网站）
     public FileDownload(String based){
         this.based=based;
     }
@@ -34,7 +34,7 @@ public class FileDownload implements Downloadable{
     @Override
     public void downloadText(String path,String text){
         try {
-            BufferedWriter writer=forFile(path);
+            BufferedWriter writer=forFile(path+".txt");
             char[] buffer=text.toCharArray();
             writer.write(buffer);
             writer.flush();

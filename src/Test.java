@@ -1,15 +1,26 @@
+import DAO.MySQLSelecter;
+import DAO.Select;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.SQLException;
 import java.text.ParseException;
 
 public class Test {
-    public static void main(String[] args) throws IOException, ParseException {
-        AbstractCatch abstractCatch=new TencentDispatch();
-        abstractCatch.getNews();
+    public static void main(String[] args) throws IOException, ParseException, ClassNotFoundException, SQLException {
+        /*Class.forName("com.mysql.jdbc.Driver");
+        String url="jdbc:mysql://localhost:3306/hadoop?serverTimezone=UTC";
+        String username="root";
+        String password="root";
+        Connection connection=(Connection) DriverManager.getConnection(url,username,password);*/
+        /*AbstractCatch abstractCatch=new TencentDispatch();
+        abstractCatch.getNews();*/
+        Select select=new MySQLSelecter();
+        System.out.println(select.haveJoined("123456","48654856"));
         /*System.out.println(new Date().getTime()+"\t"+System.currentTimeMillis());
         System.out.println(new SimpleDateFormat("yyyyMMdd").parse("20190104").getTime());
         Calendar calendar=Calendar.getInstance();

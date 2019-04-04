@@ -3,6 +3,7 @@ import bean.tencent.NewsList;
 import bean.tencent.TencentCategories;
 import bean.tencent.WindowDATA;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import download.FileDownload;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -66,13 +67,13 @@ public class TencentDispatch extends AbstractCatch{
     //腾讯的滚动新闻API在此处理。
     @Override
     protected String buildURLString() {
-        int num=15;
+        int num=20;
         int page=0;
         while (true) {
-            String listUrl = TENCENT_API + dataBeans.get(0).getName() + ":" + buildTime(2019,4,3,"yyyyMMdd") + "&num=" + num + "&page="+page;
+            String listUrl = TENCENT_API + dataBeans.get(33).getName() + ":" + buildTime(2019,4,3,"yyyyMMdd") + "&num=" + num + "&page="+page;
             try {
                 NewsList newsList = getNewsList(listUrl);
-                if ("ok".equals(newsList.getMsg())) {
+                if (newsList!=null&&"ok".equals(newsList.getMsg())) {
                     List<NewsList.DataBean> list = newsList.getData();
                     Iterator<NewsList.DataBean> iterator = list.iterator();
                     while (iterator.hasNext()) {
@@ -105,7 +106,13 @@ public class TencentDispatch extends AbstractCatch{
         System.out.println(api);
         System.out.println(resultStr);
         Gson gson=new Gson();
-        return gson.fromJson(resultStr,NewsList.class);
+        try {
+            NewsList result=gson.fromJson(resultStr,NewsList.class);
+            return result;
+        }catch (JsonSyntaxException e){
+            System.out.println("----------------------------------------------");
+            return null;
+        }
     }
 
     @Override
