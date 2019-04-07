@@ -41,4 +41,9 @@ public class MySQLPersister implements Persist{
     public void insertTimeLos(String source, String type, long start_time, int status) {
 
     }
+
+    @Override
+    public void close() throws SQLException {
+        this.connection.close();
+    }
 }

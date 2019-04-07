@@ -67,6 +67,7 @@ public abstract class AbstractCatch {
         inputStream.close();
         return temp;
     }
+    //获取新闻。外部获取新闻最终调用的是该方法。
     protected abstract void getNews();
     //将分析后的News统一加入给定队列。（该参数队列必须线程安全）
     protected void getNews(String charset) throws Exception {
