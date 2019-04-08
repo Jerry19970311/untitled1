@@ -4,7 +4,6 @@ import bean.tencent.TencentCategories;
 import bean.tencent.WindowDATA;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import download.FileDownload;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -23,8 +22,9 @@ public class TencentDispatch extends AbstractCatch{
     //private String url;
     public TencentDispatch() throws FileNotFoundException {
         super();
-        downloader=new FileDownload(basePath+"tencent");
-        source="腾讯";
+        //downloader=new FileDownload(basePath+"tencent");
+        basePath=basePath+"tencent/";
+        source="tencent";
         categories=new Gson().fromJson(new FileReader("tencent_categories.json"),TencentCategories.class);
         dataBeans=categories.getData();
     }
@@ -59,8 +59,11 @@ public class TencentDispatch extends AbstractCatch{
         Set<String> tags=new HashSet<String>();
         tags.addAll(Arrays.asList(tagString));
         result.setTags(tags);
-        downloader.download(result);
-        downloader.downloadText(result.getText_path(),getArticle(document));
+        String dir=basePath+getDateIn8bits(result.getPublish_time())+"/"+result.getType()+"/";
+        String path=dir+result.getSource()+"-"+result.getId();
+        result.setText_path(path);
+        downloader.download(dir,path,result);
+        downloader.downloadText(dir,path,getArticle(document));
         return result;
     }
 
@@ -70,7 +73,7 @@ public class TencentDispatch extends AbstractCatch{
         int num=20;
         int page=0;
         while (true) {
-            String listUrl = TENCENT_API + dataBeans.get(33).getName() + ":" + buildTime(2019,4,3,"yyyyMMdd") + "&num=" + num + "&page="+page;
+            String listUrl = TENCENT_API + dataBeans.get(0).getName() + ":" + buildTime(2019,4,5,"yyyyMMdd") + "&num=" + num + "&page="+page;
             try {
                 NewsList newsList = getNewsList(listUrl);
                 if (newsList!=null&&"ok".equals(newsList.getMsg())) {

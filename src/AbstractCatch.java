@@ -1,5 +1,6 @@
 import bean.NewsItem;
 import download.Downloadable;
+import download.FileDownload;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,6 +25,7 @@ public abstract class AbstractCatch {
     //种子队列。（处理例如）
     protected Queue<String> seedQueue;
     public AbstractCatch(){
+        downloader=new FileDownload();
         textHtmlQueue=new LinkedBlockingQueue<>();
         seedQueue=new LinkedBlockingQueue<>();
         initSeeds();
@@ -125,5 +127,9 @@ public abstract class AbstractCatch {
     public long buildTimeInLong(String date,String format) throws ParseException {
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat(format);
         return simpleDateFormat.parse(date).getTime();
+    }
+    public String getDateIn8bits(long millis){
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyyMMdd");
+        return simpleDateFormat.format(new Date(millis));
     }
 }

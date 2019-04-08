@@ -4,12 +4,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 public class SinaDispatch extends AbstractCatch implements ClickedUpdatable{
+    public SinaDispatch(){
+        super();
+        basePath=basePath+"sina/";
+        source="sina";
+    }
     @Override
     protected void initSeeds() {
 
@@ -24,6 +26,7 @@ public class SinaDispatch extends AbstractCatch implements ClickedUpdatable{
     protected NewsItem analyse(String text) throws Exception {
         Set<String> tags=new HashSet<String>();
         NewsItem result=new NewsItem();
+        result.setSource(source);
         Document document= Jsoup.parse(text);
         Element head=document.selectFirst("head");
         //title标签是把浏览器中的标签信息原封不动搬过来的，所以不提倡用。
@@ -51,7 +54,8 @@ public class SinaDispatch extends AbstractCatch implements ClickedUpdatable{
             }
             if("article:published_time".equals(temp.attr("property"))){
                 String originalTime=temp.attr("content");
-                long time=buildTimeInLong(originalTime,"yyyy-MM-ddTHH;mm:ss+08:00");
+                long time=buildTimeInLong(originalTime,"yyyy-MM-dd'T'HH:mm:ss+08:00");
+                System.out.println("------------------"+new Date(time)+"-------------------------");
                 result.setPublish_time(time);
                 check[3]=true;
             }
@@ -77,9 +81,12 @@ public class SinaDispatch extends AbstractCatch implements ClickedUpdatable{
             resultTextBuilder.append(iterator.next().text());
         }
         String resultText=resultTextBuilder.toString();
-        downloader.download(result);
-        downloader.downloadText(result.getText_path(),resultText);
-        return null;
+        String dir=basePath+getDateIn8bits(result.getPublish_time())+"/"+result.getType()+"/";
+        String path=dir+result.getSource()+"-"+result.getId();
+        downloader.download(dir,path,result);
+        downloader.downloadText(dir,path,resultText);
+        System.out.println("text:\n"+resultText);
+        return result;
     }
 
     public boolean chec(boolean[] ch){

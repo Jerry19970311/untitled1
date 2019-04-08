@@ -4,20 +4,18 @@ import bean.NewsItem;
 import com.google.gson.Gson;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class FileDownload implements Downloadable{
-    protected String based;//基本路径（精确到source，也就是面向同一新闻网站）
-    public FileDownload(String based){
+    //protected String based;//基本路径（精确到source，也就是面向同一新闻网站）
+    /*public FileDownload(String based){
         this.based=based;
-    }
+    }*/
     @Override
-    public void download(NewsItem newsItem){
-        String dir=this.based+"/"+getDateIn8bits(newsItem.getPublish_time())+"/"+newsItem.getType()+"/";
-        System.out.println("dir:"+dir);
+    public void download(String dir,String path,NewsItem newsItem){
+        //String dir=this.based+"/"+getDateIn8bits(newsItem.getPublish_time())+"/"+newsItem.getType()+"/";
+        //System.out.println("dir:"+dir);
         forDir(dir);
-        String path=dir+newsItem.getSource()+"-"+newsItem.getId();
+        //String path=dir+newsItem.getSource()+"-"+newsItem.getId();
         String text=getStringFromNewsItem(newsItem);
         BufferedWriter writer;
         try {
@@ -32,7 +30,7 @@ public class FileDownload implements Downloadable{
     }
 
     @Override
-    public void downloadText(String path,String text){
+    public void downloadText(String dir,String path,String text){
         try {
             BufferedWriter writer=forFile(path+".txt");
             char[] buffer=text.toCharArray();
@@ -58,10 +56,6 @@ public class FileDownload implements Downloadable{
         OutputStreamWriter outputStreamWriter=new OutputStreamWriter(fileOutputStream);
         BufferedWriter bufferedWriter=new BufferedWriter(outputStreamWriter);
         return bufferedWriter;
-    }
-    public String getDateIn8bits(long millis){
-        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyyMMdd");
-        return simpleDateFormat.format(new Date(millis));
     }
 
     public String getStringFromNewsItem(NewsItem newsItem){
